@@ -3,9 +3,8 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Optional
 
-from fastapi import FastAPI, UploadFile, File, Query, HTTPException
+from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.responses import Response
 from prometheus_fastapi_instrumentator import Instrumentator
 
@@ -43,15 +42,15 @@ def ready():
 
 @app.post("/super-resolve", tags=["inference"])
 async def run_super_resolution(
-    file: UploadFile = File(..., description="LR volume as raw bytes (.raw file)"),
+    file: UploadFile = File(..., description="LR volume as raw bytes (.raw file)"),  # noqa: B008
     x: int     = Query(...,  description="LR volume width  (voxels)"),
     y: int     = Query(...,  description="LR volume height (voxels)"),
     z: int     = Query(...,  description="LR volume depth  (voxels)"),
     dtype: str = Query("float32", description="LR voxel dtype: float32 | uint16 | int16"),
     lr_spacing: float = Query(...,  description="LR voxel size in µm (e.g. 5.38)"),
     hr_spacing: float = Query(...,  description="HR voxel size in µm (e.g. 0.65)"),
-    lr_norm_lo: Optional[float] = Query(None, description="LR normalisation lower bound (optional)"),
-    lr_norm_hi: Optional[float] = Query(None, description="LR normalisation upper bound (optional)"),
+    lr_norm_lo: float | None = Query(None, description="LR normalisation lower bound (optional)"),
+    lr_norm_hi: float | None = Query(None, description="LR normalisation upper bound (optional)"),
     out_dtype: str = Query("float32", description="Output dtype: float32 | uint16"),
     overlap:    int = Query(16,  description="Tile overlap in HR voxels"),
     batch_size: int = Query(4,   description="Tiles per GPU batch"),

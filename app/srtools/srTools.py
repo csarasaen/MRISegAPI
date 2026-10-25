@@ -4,10 +4,11 @@ Adapted from sr_pipeline_v04/srtools/srTools.py.
 Change: the `mltools` import (training-time only) is moved inside makeSRUNet()
         so the module loads cleanly without that package installed.
 """
+# ruff: noqa: N999
+from concurrent.futures import ThreadPoolExecutor
 import itertools
 import json
 import threading
-from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import tensorflow as tf
@@ -21,7 +22,7 @@ from app.srtools import srData
 def makeSRUNet(subvolDims, **modelParams):
     """3D U-Net for super-resolution (requires mltools — training only)."""
     # Import deferred: mltools is not needed for inference
-    from mltools import networkBuilding as netBldg  # noqa: PLC0415
+    from mltools import networkBuilding as netBldg
 
     params = dict(modelParams)
     params.setdefault('channels', 1)

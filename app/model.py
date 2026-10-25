@@ -6,13 +6,13 @@
 #   Unet_SR_UNet3D_final.weights.h5  — trained weights
 #
 # To use a different name pair, set MODEL_JSON and MODEL_WEIGHTS env vars.
-import os
 import logging
+import os
 
 import numpy as np
 import tensorflow as tf
 
-from app.srtools import srTools, srData
+from app.srtools import srData, srTools
 
 logger = logging.getLogger(__name__)
 

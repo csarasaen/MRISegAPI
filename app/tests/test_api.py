@@ -1,11 +1,9 @@
 # test_api.py — API smoke tests (no model weights required)
 #
 # These tests mock super_resolve so the suite runs in CI without a GPU or model files.
-import io
 from unittest.mock import patch
 
 import numpy as np
-import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app

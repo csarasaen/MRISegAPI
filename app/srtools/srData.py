@@ -5,13 +5,14 @@ Change: the `fileIO` dependency (training-time utility) is replaced with a
         self-contained regex parser for the .raw filename convention:
         <prefix>_<dtype>_<x>x<y>x<z>.raw  (x,y,z are voxel counts per axis)
 """
+# ruff: noqa: N999
+from collections import deque
 import itertools
 import json
 import math
 import multiprocessing as mp
 import os
 import re
-from collections import deque
 
 import numpy as np
 from scipy import ndimage
@@ -84,8 +85,8 @@ def lrCoords(originUm, size, hrSpacing, lrSpacing, lrOffsetUm=(0, 0, 0)):
 
 def sampleOnGrid(src, srcOriginInd, coords1d, order=3):
     """Interpolate src at separable grid coords1d. Only reads the needed block."""
-    lo = [int(math.floor(c[0])) - 2 for c in coords1d]
-    hi = [int(math.ceil(c[-1])) + 3 for c in coords1d]
+    lo = [math.floor(c[0]) - 2 for c in coords1d]
+    hi = [math.ceil(c[-1]) + 3 for c in coords1d]
     block = readPadded(src, [l - o for l, o in zip(lo, srcOriginInd)],
                        [h - o for h, o in zip(hi, srcOriginInd)])
     grid = np.meshgrid(*[c - l for c, l in zip(coords1d, lo)], indexing='ij')
