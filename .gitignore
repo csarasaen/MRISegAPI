@@ -5,6 +5,8 @@ __pycache__/
 .venv/
 venv/
 *.egg-info/
+dist/
+build/
 
 # Model weights (too large for Git)
 *.pth
@@ -16,6 +18,7 @@ models/weights/
 # Environment variables (NEVER commit secrets)
 .env
 .env.*
+.env.local
 
 # Terraform state (contains credentials)
 *.tfstate
@@ -28,3 +31,10 @@ models/weights/
 
 # macOS
 .DS_Store
+
+# Windows
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

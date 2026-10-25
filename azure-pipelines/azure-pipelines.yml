@@ -1,0 +1,72 @@
+# Azure DevOps pipeline for the MRI segmentation service
+trigger:
+  branches:
+    include: [main]
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  PYTHON_VERSION: '3.12'
+  IMAGE_REPO: 'mri-seg-acr.azurecr.io/mri-segmentation'
+
+stages:
+
+  - stage: Validate
+    displayName: Lint & Test
+    jobs:
+      - job: PythonLintTest
+        displayName: Python lint and test
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '$(PYTHON_VERSION)'
+
+          - script: |
+              pip install -r app/requirements.txt ruff pytest httpx
+              ruff check app/
+              pytest app/tests/ -v --tb=short
+            displayName: Install, lint, test
+
+          - task: PublishTestResults@2
+            condition: always()
+            inputs:
+              testResultsFormat: JUnit
+              testResultsFiles: '**/test-results.xml'
+
+  - stage: Build
+    displayName: Build & Push Docker Image
+    dependsOn: Validate
+    jobs:
+      - job: DockerBuild
+        displayName: Build and push to ACR
+        steps:
+          - task: Docker@2
+            displayName: Build and push
+            inputs:
+              command: buildAndPush
+              repository: mri-segmentation
+              dockerfile: app/Dockerfile
+              containerRegistry: myACRServiceConnection
+              tags: |
+                latest
+                $(Build.BuildId)
+
+  - stage: Deploy
+    displayName: Deploy to AKS
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - deployment: DeployMRISeg
+        displayName: Deploy MRI segmentation service
+        environment: production
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: KubernetesManifest@1
+                  displayName: Deploy to AKS
+                  inputs:
+                    action: deploy
+                    manifests: kubernetes/manifests/deployment.yml
+                    containers: $(IMAGE_REPO):$(Build.BuildId)
