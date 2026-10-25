@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Model weights (too large for Git)
+*.pth
+*.pt
+*.h5
+*.onnx
+models/weights/
+
+# Environment variables (NEVER commit secrets)
+.env
+.env.*
+
+# Terraform state (contains credentials)
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
+# Docker
+.dockerignore
+
+# macOS
+.DS_Store
