@@ -5,10 +5,10 @@ Change: the `mltools` import (training-time only) is moved inside makeSRUNet()
         so the module loads cleanly without that package installed.
 """
 # ruff: noqa: N999
-from concurrent.futures import ThreadPoolExecutor
 import itertools
 import json
 import threading
+from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import tensorflow as tf

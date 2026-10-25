@@ -6,13 +6,13 @@ Change: the `fileIO` dependency (training-time utility) is replaced with a
         <prefix>_<dtype>_<x>x<y>x<z>.raw  (x,y,z are voxel counts per axis)
 """
 # ruff: noqa: N999
-from collections import deque
 import itertools
 import json
 import math
 import multiprocessing as mp
 import os
 import re
+from collections import deque
 
 import numpy as np
 from scipy import ndimage
