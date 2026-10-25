@@ -17,7 +17,6 @@ from collections import deque
 import numpy as np
 from scipy import ndimage
 
-
 # ─── filename parser (replaces fileIO dependency) ─────────────────────────────
 
 _RAW_RE = re.compile(r'_(u?int\d+|float\d+)_(\d+)x(\d+)x(\d+)\.raw$', re.IGNORECASE)
