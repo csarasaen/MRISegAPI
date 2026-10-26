@@ -10,23 +10,26 @@ import logging
 import os
 
 import numpy as np
-import tensorflow as tf
-
-from app.srtools import srData, srTools
 
 logger = logging.getLogger(__name__)
 
-# Reserve only what is needed — avoids OOM on shared GPU nodes
-for _gpu in tf.config.list_physical_devices('GPU'):
-    try:
-        tf.config.experimental.set_memory_growth(_gpu, True)
-    except RuntimeError:
-        pass
-
 _MODEL = None
+_TF_READY = False
 _MODEL_PATH    = os.environ.get('MODEL_PATH',    '/models')
 _MODEL_JSON    = os.environ.get('MODEL_JSON',    'Unet_SR_UNet3D.json')
 _MODEL_WEIGHTS = os.environ.get('MODEL_WEIGHTS', 'Unet_SR_UNet3D_final.weights.h5')
+
+
+def _configure_tf():
+    global _TF_READY
+    if not _TF_READY:
+        import tensorflow as tf
+        for _gpu in tf.config.list_physical_devices('GPU'):
+            try:
+                tf.config.experimental.set_memory_growth(_gpu, True)
+            except RuntimeError:
+                pass
+        _TF_READY = True
 
 
 def get_model():
@@ -40,6 +43,8 @@ def get_model():
                 f"Model architecture not found: {json_path}\n"
                 f"Mount your model files to {_MODEL_PATH} and set MODEL_PATH if different."
             )
+        from app.srtools import srTools
+        _configure_tf()
         logger.info("Loading SR model from %s", _MODEL_PATH)
         _MODEL = srTools.loadModel((json_path, weights_path))
         logger.info("Model loaded. Input shape: %s", _MODEL.input_shape)
@@ -80,6 +85,8 @@ def super_resolve(
         hr_dims_xyz: (x, y, z) of the HR output
         out_dtype  : dtype string of hr_bytes
     """
+    from app.srtools import srData, srTools
+
     x, y, z = dims_xyz
     lr_arr = np.frombuffer(lr_bytes, dtype=np.dtype(dtype)).reshape(z, y, x)
 

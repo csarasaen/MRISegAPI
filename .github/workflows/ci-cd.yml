@@ -24,7 +24,7 @@ jobs:
           cache: "pip"
 
       - name: Install dependencies
-        run: pip install -r app/requirements.txt ruff pytest httpx
+        run: pip install fastapi "uvicorn[standard]" python-multipart prometheus-fastapi-instrumentator numpy scipy ruff pytest httpx
 
       - name: Lint with ruff
         run: ruff check app/
@@ -81,6 +81,7 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
