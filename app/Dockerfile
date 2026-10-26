@@ -3,7 +3,7 @@
 FROM tensorflow/tensorflow:2.16.1 AS builder
 
 WORKDIR /build
-COPY requirements.txt .
+COPY app/requirements.txt .
 # Install only the non-TF deps here (TF already in base image)
 RUN pip install --no-cache-dir --prefix=/install \
     fastapi==0.115.0 \
@@ -15,20 +15,21 @@ RUN pip install --no-cache-dir --prefix=/install \
 # ── Runtime ───────────────────────────────────────────────────────────────────
 FROM tensorflow/tensorflow:2.16.1
 
-WORKDIR /app
+# /workspace is the Python working dir; app/ lives inside it so `from app.xxx` resolves correctly
+WORKDIR /workspace
 
 # Non-root user for security
 RUN useradd --create-home appuser
 
 COPY --from=builder /install /usr/local
-COPY . .
+COPY app/ app/
 
 # Model weights are NOT baked in — mount them at runtime via -v or K8s volume.
 # Expected at /models/Unet_SR_UNet3D.json + /models/Unet_SR_UNet3D_final.weights.h5
 VOLUME ["/models"]
 ENV MODEL_PATH=/models
 
-RUN chown -R appuser:appuser /app
+RUN chown -R appuser:appuser /workspace
 USER appuser
 
 EXPOSE 8000
