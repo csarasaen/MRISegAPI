@@ -3,7 +3,7 @@
 ![CI](https://github.com/csarasaen/MRISegAPI/actions/workflows/ci-cd.yml/badge.svg)
 
 A **production-style cloud deployment** of a 3D U-Net super-resolution service:
-a FastAPI inference endpoint wrapping `sr_pipeline_v04`, containerised with Docker,
+a FastAPI inference endpoint wrapping 'sr pipeline', containerised with Docker,
 deployed to Kubernetes on AWS EKS, provisioned via Terraform, and monitored with
 Prometheus + Grafana.
 
@@ -29,7 +29,7 @@ delivered via GitHub Actions and Azure Pipelines.
 | Folder               | What it does                                          |
 |----------------------|-------------------------------------------------------|
 | `app/`               | FastAPI SR service, 3D U-Net wrapper, tests           |
-| `app/srtools/`       | Adapted inference-only copy of `sr_pipeline_v04`      |
+| `app/srtools/`       | Adapted inference-only copy of 'sr pipeline'	       |	
 | `terraform/aws/`     | EKS cluster + VPC (Terraform)                         |
 | `kubernetes/`        | Deployment, Service, HorizontalPodAutoscaler          |
 | `.github/workflows/` | CI/CD: lint → test → build → push → deploy            |
