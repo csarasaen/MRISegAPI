@@ -1,10 +1,4 @@
-"""Data utilities for the µCT/MRI super-resolution pipeline — inference-only build.
-
-Adapted from sr_pipeline_v04/srtools/srData.py.
-Change: the `fileIO` dependency (training-time utility) is replaced with a
-        self-contained regex parser for the .raw filename convention:
-        <prefix>_<dtype>_<x>x<y>x<z>.raw  (x,y,z are voxel counts per axis)
-"""
+"""Data utilities for the µCT/MRI super-resolution pipeline — inference-only build."""
 # ruff: noqa: N999
 import itertools
 import json
@@ -17,7 +11,7 @@ from collections import deque
 import numpy as np
 from scipy import ndimage
 
-# ─── filename parser (replaces fileIO dependency) ─────────────────────────────
+# ─── filename parser ──────────────────────────────────────────────────────────
 
 _RAW_RE = re.compile(r'_(u?int\d+|float\d+)_(\d+)x(\d+)x(\d+)\.raw$', re.IGNORECASE)
 

@@ -99,5 +99,4 @@ pytest app/tests/ -v
 - **Non-root container** — security baseline for medical-data workloads
 - **Model weights NOT baked into the image** — mounted as a volume; no credential
   leakage, weights can be updated without a rebuild
-- **fileIO / mltools dependencies removed** from the inference path — the API
-  container has zero training-time dependencies
+- **No training-time dependencies** — the API container is inference-only

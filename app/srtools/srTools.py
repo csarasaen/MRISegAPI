@@ -1,9 +1,4 @@
-"""TensorFlow/Keras side of the super-resolution pipeline — inference-only build.
-
-Adapted from sr_pipeline_v04/srtools/srTools.py.
-Change: the `mltools` import (training-time only) is moved inside makeSRUNet()
-        so the module loads cleanly without that package installed.
-"""
+"""TensorFlow/Keras side of the super-resolution pipeline — inference-only build."""
 # ruff: noqa: N999
 import itertools
 import json
@@ -15,24 +10,6 @@ import tensorflow as tf
 from tensorflow import keras
 
 from app.srtools import srData
-
-# ─── model ────────────────────────────────────────────────────────────────────
-
-def makeSRUNet(subvolDims, **modelParams):
-    """3D U-Net for super-resolution (requires mltools — training only)."""
-    # Import deferred: mltools is not needed for inference
-    from mltools import networkBuilding as netBldg
-
-    params = dict(modelParams)
-    params.setdefault('channels', 1)
-    params.setdefault('depth', 5)
-    base = netBldg.makeUNet(subvolDims, 'float32', nClasses=1, finalActivation='linear', **params)
-    lastConv = [l for l in base.layers if isinstance(l, keras.layers.Conv3D)][-1]
-    features = lastConv.input
-    res = keras.layers.Conv3D(1, 1, kernel_initializer='zeros', name='sr_residual')(features)
-    sr  = keras.layers.Add(name='sr_output')([base.output, res])
-    return keras.Model(inputs=base.inputs, outputs=[sr], name='SR_UNet3D')
-
 
 def saveModel(model, saveName):
     """saveName: '.keras' file, or (json_path, weights_path) tuple."""
