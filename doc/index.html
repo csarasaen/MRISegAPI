@@ -1,0 +1,817 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>MRISegAPI Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg:#f0faf5; --bg2:#e4f5ec; --card:#ffffff; --border:#c8e6d5;
+  --fg:#0a1f14; --fg2:#376250; --fg3:#7fb99a;
+  --acc:#00a878; --acc2:#0ea5e9; --acc3:#7c3aed;
+  --ok:#10b981; --warn:#f59e0b; --err:#ef4444;
+  --shadow:0 1px 4px rgba(0,100,60,.08),0 4px 16px rgba(0,100,60,.06);
+  color-scheme:light;
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#040d09; --bg2:#0b1812; --card:#101f16; --border:#1a3326;
+    --fg:#d4ede2; --fg2:#7fb99a; --fg3:#2d5040;
+    --shadow:0 1px 4px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#040d09; --bg2:#0b1812; --card:#101f16; --border:#1a3326;
+  --fg:#d4ede2; --fg2:#7fb99a; --fg3:#2d5040;
+  --shadow:0 1px 4px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--bg);color:var(--fg);font-size:16px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0;
+}
+nav{
+  position:sticky;top:0;z-index:100;
+  background:var(--card);border-bottom:1px solid var(--border);
+  box-shadow:0 1px 8px rgba(0,80,40,.07);
+  padding:0 max(16px,env(safe-area-inset-left,0px));
+}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px;gap:12px;}
+.nav-logo{font-weight:800;font-size:.95rem;color:var(--acc);text-decoration:none;white-space:nowrap;letter-spacing:-.02em;}
+.nav-links{display:flex;gap:2px;flex-wrap:wrap;}
+.nav-links a{font-size:.78rem;font-weight:500;padding:4px 9px;border-radius:6px;color:var(--fg2);text-decoration:none;transition:all .15s;}
+.nav-links a:hover{background:var(--bg2);color:var(--fg);}
+.theme-btn{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:.82rem;color:var(--fg2);transition:all .15s;white-space:nowrap;}
+.theme-btn:hover{background:var(--border);}
+.page{max-width:1100px;margin:0 auto;}
+section{padding:60px 0;}
+section+section{border-top:1px solid var(--border);}
+.label{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--fg3);margin-bottom:8px;}
+h1{font-size:clamp(1.9rem,5vw,3rem);font-weight:800;line-height:1.1;text-wrap:balance;}
+h2{font-size:clamp(1.3rem,3vw,1.8rem);font-weight:700;line-height:1.2;text-wrap:balance;margin-bottom:8px;}
+h3{font-size:1rem;font-weight:600;margin-bottom:5px;}
+p{color:var(--fg2);}
+.lead{font-size:1.05rem;color:var(--fg2);max-width:640px;line-height:1.75;}
+code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:var(--bg2);padding:1px 5px;border-radius:4px;}
+
+/* Hero */
+.hero{padding:76px 0 60px;}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,168,120,.12);color:var(--acc);border:1px solid rgba(0,168,120,.3);padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:18px;}
+.hero h1 em{font-style:normal;color:var(--acc);}
+.hero-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;}
+.pill{display:inline-flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--border);padding:5px 12px;border-radius:20px;font-size:.78rem;font-weight:600;color:var(--fg2);}
+
+/* Stack overview */
+.stack-flow{display:flex;align-items:center;gap:0;overflow-x:auto;padding-bottom:6px;}
+.stack-node{min-width:118px;flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center;}
+.stack-node .sn-icon{font-size:1.5rem;margin-bottom:6px;}
+.stack-node .sn-title{font-size:.8rem;font-weight:700;color:var(--fg);}
+.stack-node .sn-sub{font-size:.68rem;color:var(--fg3);margin-top:2px;}
+.stack-node.hi{border-color:var(--acc);background:rgba(0,168,120,.07);}
+.stack-conn{padding:0 4px;color:var(--fg3);font-size:1.2rem;flex-shrink:0;}
+
+/* Folder tree */
+.tree{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px 24px;font-family:'JetBrains Mono',monospace;font-size:.82rem;}
+.tree-root{font-weight:700;color:var(--acc);margin-bottom:8px;}
+.tree-item{display:flex;align-items:flex-start;gap:8px;padding:3px 0;cursor:pointer;border-radius:6px;padding:4px 6px;transition:background .15s;user-select:none;}
+.tree-item:hover{background:var(--border);}
+.tree-item .ti-icon{font-size:1rem;flex-shrink:0;margin-top:1px;}
+.tree-item .ti-name{color:var(--fg);}
+.tree-item .ti-name.folder{color:var(--acc2);}
+.tree-item .ti-name.file{color:var(--fg2);}
+.tree-item .ti-desc{color:var(--fg3);margin-left:auto;font-size:.74rem;padding-left:12px;text-align:right;}
+.tree-children{padding-left:20px;border-left:1px dashed var(--border);margin-left:10px;display:none;}
+.tree-children.open{display:block;}
+
+/* Quickstart steps */
+.qs-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.qs-tab{padding:8px 18px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;border:2px solid var(--border);background:var(--card);color:var(--fg2);transition:all .15s;}
+.qs-tab.active{border-color:var(--acc);background:rgba(0,168,120,.08);color:var(--acc);}
+.qs-panel{display:none;}
+.qs-panel.active{display:block;}
+.cmd-block{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:10px;}
+.cmd-header{padding:8px 16px;font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--fg3);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.cmd-block pre{padding:16px 20px;overflow-x:auto;}
+.cmd-block code{font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.75;}
+.copy-btn{background:var(--border);border:none;border-radius:4px;padding:2px 8px;font-size:.72rem;cursor:pointer;color:var(--fg2);transition:all .15s;}
+.copy-btn:hover{background:var(--acc);color:#fff;}
+.tip-box{background:rgba(0,168,120,.08);border:1px solid rgba(0,168,120,.25);border-radius:10px;padding:14px 18px;margin-top:12px;font-size:.88rem;}
+.tip-box strong{color:var(--acc);}
+.warn-box{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:14px 18px;margin-top:12px;font-size:.88rem;}
+.warn-box strong{color:var(--warn);}
+
+/* Param table */
+.tbl-wrap{border:1px solid var(--border);border-radius:12px;overflow:hidden;overflow-x:auto;}
+.param-table{width:100%;border-collapse:collapse;font-size:.87rem;}
+.param-table th{text-align:left;padding:9px 14px;background:var(--bg2);font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--fg3);}
+.param-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;}
+.param-table tr:last-child td{border-bottom:none;}
+.param-table tr:hover td{background:var(--bg2);}
+.pn{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--acc);font-weight:600;}
+.pt{font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--acc2);}
+.pr{font-size:.68rem;font-weight:700;padding:1px 6px;border-radius:3px;}
+.req{background:rgba(239,68,68,.12);color:var(--err);}
+.opt{background:var(--bg2);color:var(--fg3);}
+
+/* Endpoint cards */
+.ep-grid{display:grid;gap:12px;}
+.ep-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:flex-start;gap:14px;}
+.ep-method{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;padding:3px 8px;border-radius:5px;min-width:46px;text-align:center;flex-shrink:0;}
+.get{background:rgba(16,185,129,.12);color:var(--ok);}
+.post{background:rgba(14,165,233,.12);color:var(--acc2);}
+.ep-path{font-family:'JetBrains Mono',monospace;font-size:.88rem;font-weight:600;color:var(--fg);}
+.ep-desc{font-size:.85rem;color:var(--fg2);margin-top:2px;}
+
+/* Monitoring mockup */
+.mon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:20px;}
+.mon-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+.mon-card .mc-title{font-size:.75rem;font-weight:600;color:var(--fg3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.mon-card .mc-val{font-family:'JetBrains Mono',monospace;font-size:1.7rem;font-weight:700;color:var(--fg);}
+.mon-card .mc-sub{font-size:.75rem;color:var(--fg3);margin-top:2px;}
+.sparkline{height:40px;margin-top:8px;}
+.spark-bar{height:100%;display:flex;align-items:flex-end;gap:3px;}
+.spark-bar span{flex:1;border-radius:2px 2px 0 0;min-width:4px;background:var(--acc);opacity:.7;transition:opacity .2s;}
+.spark-bar span:hover{opacity:1;}
+.mon-urls{margin-top:16px;display:flex;flex-direction:column;gap:6px;}
+.mon-url{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg2);border-radius:8px;font-size:.82rem;}
+.mon-url a{font-family:'JetBrains Mono',monospace;color:var(--acc2);text-decoration:none;font-weight:500;}
+.mon-url .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dot-g{background:var(--ok);}
+
+/* K8s diagram */
+.k8s-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;}
+.k8s-box{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:18px 20px;flex:1;min-width:200px;}
+.k8s-box.dep{border-color:var(--acc2);}
+.k8s-box.svc{border-color:var(--acc);}
+.k8s-box.hpa{border-color:var(--warn);}
+.k8s-badge{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:4px;margin-bottom:8px;font-family:'JetBrains Mono',monospace;}
+.k8s-box.dep .k8s-badge{background:rgba(14,165,233,.12);color:var(--acc2);}
+.k8s-box.svc .k8s-badge{background:rgba(0,168,120,.12);color:var(--acc);}
+.k8s-box.hpa .k8s-badge{background:rgba(245,158,11,.12);color:var(--warn);}
+.k8s-row-item{display:flex;align-items:center;gap:8px;font-size:.83rem;padding:4px 0;border-bottom:1px solid var(--border);}
+.k8s-row-item:last-child{border:none;}
+.k8s-key{color:var(--fg3);min-width:90px;font-size:.78rem;}
+.k8s-val{font-family:'JetBrains Mono',monospace;color:var(--fg);font-size:.8rem;}
+
+/* CI/CD pipeline */
+.pipeline{display:flex;align-items:center;gap:0;overflow-x:auto;padding-bottom:6px;}
+.pipe-step{min-width:110px;flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 10px;text-align:center;}
+.pipe-step .ps-icon{font-size:1.4rem;margin-bottom:4px;}
+.pipe-step .ps-label{font-size:.75rem;font-weight:700;color:var(--fg);}
+.pipe-step .ps-sub{font-size:.68rem;color:var(--fg3);margin-top:2px;}
+.pipe-step.hi{border-color:var(--acc);background:rgba(0,168,120,.07);}
+.pipe-arr{color:var(--fg3);padding:0 4px;font-size:1.1rem;flex-shrink:0;}
+.pipe-note{font-size:.78rem;color:var(--fg3);margin-top:8px;}
+.continue-badge{font-size:.65rem;background:rgba(245,158,11,.12);color:var(--warn);padding:1px 6px;border-radius:3px;font-weight:700;}
+
+/* Concepts */
+.concept-list{display:flex;flex-direction:column;gap:8px;}
+.concept-item{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.concept-header{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;cursor:pointer;user-select:none;transition:background .15s;}
+.concept-header:hover{background:var(--bg2);}
+.concept-title{font-weight:600;display:flex;align-items:center;gap:9px;font-size:.93rem;}
+.chevron{transition:transform .22s;}
+.concept-item.open .chevron{transform:rotate(180deg);}
+.concept-body{display:none;padding:0 18px 14px;}
+.concept-item.open .concept-body{display:block;}
+.concept-body p{font-size:.88rem;}
+
+/* Two col */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start;}
+@media(max-width:780px){.two-col{grid-template-columns:1fr;}}
+
+/* Syntax */
+.c-kw{color:#c678dd;} .c-str{color:#98c379;} .c-cmt{color:#5c6370;font-style:italic;}
+.c-fn{color:#61afef;} .c-var{color:#e06c75;} .c-num{color:#d19a66;} .c-attr{color:#e5c07b;}
+.c-ok{color:var(--ok);} .c-acc{color:var(--acc);}
+
+footer{margin-top:80px;border-top:1px solid var(--border);padding:30px 0;color:var(--fg3);font-size:.83rem;text-align:center;}
+footer a{color:var(--acc);text-decoration:none;}
+
+@media(max-width:600px){
+  .k8s-row{flex-direction:column;}
+  .pipeline{font-size:.85rem;}
+}
+</style>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#top">MRISegAPI</a>
+    <div class="nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#structure">Structure</a>
+      <a href="#quickstart">Quickstart</a>
+      <a href="#api">API</a>
+      <a href="#monitoring">Monitor</a>
+      <a href="#k8s">K8s</a>
+      <a href="#cicd">CI/CD</a>
+    </div>
+    <button class="theme-btn" onclick="toggleTheme()">🌙 Theme</button>
+  </div>
+</nav>
+
+<div class="page" id="top">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">🧠 MRI · µCT · 3D U-Net · FastAPI</div>
+  <h1>How <em>MRISegAPI</em> works<br>&amp; how to use it</h1>
+  <p class="lead">A complete visual guide to the MRI/µCT super-resolution platform — from cloning the repo to getting a super-resolved volume back from the API.</p>
+  <div class="hero-pills">
+    <span class="pill">🐍 Python 3.12</span>
+    <span class="pill">⚡ FastAPI</span>
+    <span class="pill">🧠 TensorFlow 2.16</span>
+    <span class="pill">🐳 Docker</span>
+    <span class="pill">☸️ Kubernetes (EKS)</span>
+    <span class="pill">🏗️ Terraform</span>
+    <span class="pill">📊 Prometheus + Grafana</span>
+  </div>
+</section>
+
+<!-- OVERVIEW -->
+<section id="overview">
+  <div class="label">What the repo does</div>
+  <h2>One service — the full production stack</h2>
+  <p style="margin-bottom:24px">Send a low-resolution .raw scan → get a super-resolved .raw volume back. The rest of the repo handles deployment, scaling, monitoring, and CI/CD.</p>
+
+  <div class="stack-flow" style="margin-bottom:28px;">
+    <div class="stack-node hi">
+      <div class="sn-icon">🖥️</div>
+      <div class="sn-title">You</div>
+      <div class="sn-sub">curl / Python / Swagger</div>
+    </div>
+    <div class="stack-conn">→</div>
+    <div class="stack-node hi">
+      <div class="sn-icon">⚡</div>
+      <div class="sn-title">FastAPI</div>
+      <div class="sn-sub">POST /super-resolve</div>
+    </div>
+    <div class="stack-conn">→</div>
+    <div class="stack-node hi">
+      <div class="sn-icon">🧠</div>
+      <div class="sn-title">3D U-Net</div>
+      <div class="sn-sub">TensorFlow inference</div>
+    </div>
+    <div class="stack-conn">→</div>
+    <div class="stack-node hi">
+      <div class="sn-icon">📥</div>
+      <div class="sn-title">HR Volume</div>
+      <div class="sn-sub">.raw bytes returned</div>
+    </div>
+  </div>
+
+  <div class="stack-flow">
+    <div class="stack-node">
+      <div class="sn-icon">🐳</div>
+      <div class="sn-title">Docker</div>
+      <div class="sn-sub">containerised app</div>
+    </div>
+    <div class="stack-conn">+</div>
+    <div class="stack-node">
+      <div class="sn-icon">☸️</div>
+      <div class="sn-title">Kubernetes</div>
+      <div class="sn-sub">EKS, 2→20 pods</div>
+    </div>
+    <div class="stack-conn">+</div>
+    <div class="stack-node">
+      <div class="sn-icon">🏗️</div>
+      <div class="sn-title">Terraform</div>
+      <div class="sn-sub">AWS EKS IaC</div>
+    </div>
+    <div class="stack-conn">+</div>
+    <div class="stack-node">
+      <div class="sn-icon">📊</div>
+      <div class="sn-title">Prometheus</div>
+      <div class="sn-sub">+ Grafana metrics</div>
+    </div>
+    <div class="stack-conn">+</div>
+    <div class="stack-node">
+      <div class="sn-icon">🔄</div>
+      <div class="sn-title">GitHub Actions</div>
+      <div class="sn-sub">CI/CD pipeline</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOLDER STRUCTURE -->
+<section id="structure">
+  <div class="label">Repo layout</div>
+  <h2>What every folder does</h2>
+  <p style="margin-bottom:20px">Click a folder to expand it and see what's inside.</p>
+  <div class="two-col">
+    <div class="tree">
+      <div class="tree-root">📁 MRISegAPI/</div>
+      <div class="tree-item" onclick="toggleTree(this)">
+        <span class="ti-icon">📂</span>
+        <span class="ti-name folder">app/</span>
+        <span class="ti-desc">core FastAPI service</span>
+      </div>
+      <div class="tree-children">
+        <div class="tree-item"><span class="ti-icon">📄</span><span class="ti-name file">main.py</span><span class="ti-desc">API endpoints</span></div>
+        <div class="tree-item"><span class="ti-icon">📄</span><span class="ti-name file">model.py</span><span class="ti-desc">U-Net wrapper</span></div>
+        <div class="tree-item"><span class="ti-icon">📄</span><span class="ti-name file">requirements.txt</span><span class="ti-desc">Python deps</span></div>
+        <div class="tree-item"><span class="ti-icon">🐳</span><span class="ti-name file">Dockerfile</span><span class="ti-desc">container image</span></div>
+        <div class="tree-item" onclick="toggleTree(this)"><span class="ti-icon">📂</span><span class="ti-name folder">srtools/</span><span class="ti-desc">SR inference logic</span></div>
+        <div class="tree-children">
+          <div class="tree-item"><span class="ti-icon">📄</span><span class="ti-name file">srData.py</span><span class="ti-desc">normalise, percentiles</span></div>
+          <div class="tree-item"><span class="ti-icon">📄</span><span class="ti-name file">srTools.py</span><span class="ti-desc">tile, infer, stitch</span></div>
+        </div>
+        <div class="tree-item" onclick="toggleTree(this)"><span class="ti-icon">📂</span><span class="ti-name folder">tests/</span><span class="ti-desc">pytest smoke tests</span></div>
+        <div class="tree-children">
+          <div class="tree-item"><span class="ti-icon">📄</span><span class="ti-name file">test_api.py</span><span class="ti-desc">5 tests, no GPU needed</span></div>
+        </div>
+      </div>
+
+      <div class="tree-item" onclick="toggleTree(this)">
+        <span class="ti-icon">📂</span>
+        <span class="ti-name folder">kubernetes/manifests/</span>
+        <span class="ti-desc">K8s YAML</span>
+      </div>
+      <div class="tree-children">
+        <div class="tree-item"><span class="ti-icon">📄</span><span class="ti-name file">deployment.yml</span><span class="ti-desc">Deployment + Service + HPA</span></div>
+      </div>
+
+      <div class="tree-item" onclick="toggleTree(this)">
+        <span class="ti-icon">📂</span>
+        <span class="ti-name folder">terraform/aws/</span>
+        <span class="ti-desc">AWS infrastructure</span>
+      </div>
+      <div class="tree-children">
+        <div class="tree-item"><span class="ti-icon">📄</span><span class="ti-name file">main.tf</span><span class="ti-desc">EKS cluster + VPC</span></div>
+        <div class="tree-item"><span class="ti-icon">📄</span><span class="ti-name file">variables.tf</span><span class="ti-desc">configurable inputs</span></div>
+        <div class="tree-item"><span class="ti-icon">📄</span><span class="ti-name file">outputs.tf</span><span class="ti-desc">cluster endpoint etc.</span></div>
+      </div>
+
+      <div class="tree-item" onclick="toggleTree(this)">
+        <span class="ti-icon">📂</span>
+        <span class="ti-name folder">monitoring/</span>
+        <span class="ti-desc">metrics stack</span>
+      </div>
+      <div class="tree-children">
+        <div class="tree-item"><span class="ti-icon">🐳</span><span class="ti-name file">docker-compose.yml</span><span class="ti-desc">run all 3 tools locally</span></div>
+        <div class="tree-item"><span class="ti-icon">📄</span><span class="ti-name file">prometheus/prometheus.yml</span><span class="ti-desc">scrape config</span></div>
+        <div class="tree-item"><span class="ti-icon">📄</span><span class="ti-name file">grafana/datasources/…</span><span class="ti-desc">auto-provision Grafana</span></div>
+      </div>
+
+      <div class="tree-item" onclick="toggleTree(this)">
+        <span class="ti-icon">📂</span>
+        <span class="ti-name folder">.github/workflows/</span>
+        <span class="ti-desc">CI/CD</span>
+      </div>
+      <div class="tree-children">
+        <div class="tree-item"><span class="ti-icon">📄</span><span class="ti-name file">ci-cd.yml</span><span class="ti-desc">lint → test → build → deploy</span></div>
+      </div>
+
+      <div class="tree-item" onclick="toggleTree(this)">
+        <span class="ti-icon">📂</span>
+        <span class="ti-name folder">azure-pipelines/</span>
+        <span class="ti-desc">Azure DevOps mirror</span>
+      </div>
+      <div class="tree-children">
+        <div class="tree-item"><span class="ti-icon">📄</span><span class="ti-name file">azure-pipelines.yml</span><span class="ti-desc">same stages, ADO syntax</span></div>
+      </div>
+
+      <div class="tree-item"><span class="ti-icon">📄</span><span class="ti-name file">README.md</span><span class="ti-desc">project overview</span></div>
+    </div>
+
+    <!-- Model files note -->
+    <div>
+      <div style="background:rgba(245,158,11,.08);border:2px dashed rgba(245,158,11,.4);border-radius:14px;padding:20px 22px;margin-bottom:16px;">
+        <h3 style="color:var(--warn);margin-bottom:8px;">⚠️ Model files — NOT in the repo</h3>
+        <p style="font-size:.88rem;">The trained weights are large binary files. You need to place them at:</p>
+        <div style="background:var(--bg2);border-radius:8px;padding:10px 14px;margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.7;">
+          models/<br>
+          ├── Unet_SR_UNet3D.json<br>
+          └── Unet_SR_UNet3D_final.weights.h5
+        </div>
+        <p style="font-size:.82rem;margin-top:10px;">Generated by <code>UNet3D_SR_training.py</code>. Mount this folder at <code>/models</code> inside the container via <code>-v</code> or a Kubernetes volume.</p>
+      </div>
+      <div style="background:rgba(0,168,120,.08);border:1px solid rgba(0,168,120,.2);border-radius:12px;padding:16px 18px;">
+        <h3 style="color:var(--acc);margin-bottom:6px;">✅ No model? Still works for tests</h3>
+        <p style="font-size:.88rem;">The test suite mocks <code>super_resolve</code> — all 5 tests pass without TensorFlow or model weights. Great for CI.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUICKSTART -->
+<section id="quickstart">
+  <div class="label">Getting started</div>
+  <h2>Up and running in 3 steps</h2>
+  <p style="margin-bottom:24px">Choose your path — local Docker, tests only, or the monitoring stack.</p>
+  <div class="qs-tabs">
+    <button class="qs-tab active" onclick="switchQS('docker',this)">🐳 Run with Docker</button>
+    <button class="qs-tab" onclick="switchQS('tests',this)">🧪 Run Tests</button>
+    <button class="qs-tab" onclick="switchQS('monitoring',this)">📊 Monitoring Stack</button>
+  </div>
+
+  <div id="qs-docker" class="qs-panel active">
+    <p style="margin-bottom:12px;font-size:.9rem;">Build the image from the repo root, mount your model weights, and the API is live at <code>localhost:8000</code>.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span>Step 1 — Build</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><code><span class="c-cmt"># Run from the repo root (MRISegAPI/)</span>
+<span class="c-fn">docker build</span> <span class="c-attr">-t</span> mri-sr:latest ./app</code></pre>
+    </div>
+    <div class="cmd-block" style="margin-top:8px;">
+      <div class="cmd-header"><span>Step 2 — Run (with model weights)</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><code><span class="c-fn">docker run</span> <span class="c-attr">-p</span> 8000:8000 \
+  <span class="c-attr">-v</span> <span class="c-str">"C:/path/to/your/models:/models"</span> \
+  mri-sr:latest</code></pre>
+    </div>
+    <div class="cmd-block" style="margin-top:8px;">
+      <div class="cmd-header"><span>Step 3 — Test it's alive</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><code><span class="c-fn">curl</span> <span class="c-str">http://localhost:8000/healthz</span>
+<span class="c-cmt"># → {"status":"ok"}</span>
+
+<span class="c-fn">curl</span> <span class="c-str">http://localhost:8000/ready</span>
+<span class="c-cmt"># → {"status":"ready"}  (only once model is loaded)</span></code></pre>
+    </div>
+    <div class="tip-box" style="margin-top:12px;">
+      <strong>💡 Tip:</strong> Open <code>http://localhost:8000/docs</code> in your browser to get the interactive Swagger UI — you can upload a .raw file and try the API with zero code.
+    </div>
+    <div class="warn-box">
+      <strong>⚠️ GPU nodes:</strong> The default Docker image uses the CPU TF build. For GPU inference, change the base image tag in <code>app/Dockerfile</code> to <code>tensorflow/tensorflow:2.16.1-gpu</code> and ensure NVIDIA Container Toolkit is installed.
+    </div>
+  </div>
+
+  <div id="qs-tests" class="qs-panel">
+    <p style="margin-bottom:12px;font-size:.9rem;">No GPU, no model weights needed — the tests mock the inference function.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span>Install and run</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><code><span class="c-cmt"># From repo root</span>
+<span class="c-fn">pip install</span> -r app/requirements.txt pytest httpx
+
+<span class="c-fn">pytest</span> app/tests/ <span class="c-attr">-v</span>
+
+<span class="c-cmt"># Expected output:</span>
+<span class="c-ok">PASSED</span> app/tests/test_api.py::test_health
+<span class="c-ok">PASSED</span> app/tests/test_api.py::test_ready_without_model_returns_503
+<span class="c-ok">PASSED</span> app/tests/test_api.py::test_super_resolve_returns_raw
+<span class="c-ok">PASSED</span> app/tests/test_api.py::test_wrong_dtype_rejected
+<span class="c-ok">PASSED</span> app/tests/test_api.py::test_lr_larger_than_hr_required
+<span class="c-cmt"># 5 passed in ~0.5s</span></code></pre>
+    </div>
+    <div class="tip-box" style="margin-top:12px;">
+      <strong>💡 Why no model needed?</strong> <code>test_api.py</code> patches <code>super_resolve</code> with a mock that just creates a zeroed numpy array of the correct HR shape. The real U-Net never runs in CI.
+    </div>
+  </div>
+
+  <div id="qs-monitoring" class="qs-panel">
+    <p style="margin-bottom:12px;font-size:.9rem;">Run the full monitoring stack — API, Prometheus, and Grafana — all in one command.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span>Launch everything</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><code><span class="c-fn">cd</span> monitoring
+<span class="c-fn">docker compose up</span> <span class="c-attr">--build</span></code></pre>
+    </div>
+    <div style="margin-top:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:1.4rem;margin-bottom:4px;">⚡</div>
+        <div style="font-weight:700;font-size:.85rem;">API</div>
+        <code style="font-size:.78rem;">:8000/docs</code>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:1.4rem;margin-bottom:4px;">📈</div>
+        <div style="font-weight:700;font-size:.85rem;">Prometheus</div>
+        <code style="font-size:.78rem;">:9090</code>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:1.4rem;margin-bottom:4px;">📊</div>
+        <div style="font-weight:700;font-size:.85rem;">Grafana</div>
+        <code style="font-size:.78rem;">:3000</code>
+      </div>
+    </div>
+    <div class="tip-box" style="margin-top:12px;">
+      <strong>💡</strong> Grafana auto-provisions the Prometheus datasource from <code>monitoring/grafana/datasources/prometheus.yml</code> — no manual setup needed. Default login: <code>admin / admin</code>.
+    </div>
+  </div>
+</section>
+
+<!-- API REFERENCE -->
+<section id="api">
+  <div class="label">API Reference</div>
+  <h2>Endpoints</h2>
+  <p style="margin-bottom:16px">The service exposes 4 endpoints. You only need <code>POST /super-resolve</code> for inference.</p>
+  <div class="ep-grid" style="margin-bottom:28px;">
+    <div class="ep-card">
+      <span class="ep-method get">GET</span>
+      <div><div class="ep-path">/healthz</div><div class="ep-desc">Always returns <code>{"status":"ok"}</code>. Use for K8s liveness probe — responds immediately with no model check.</div></div>
+    </div>
+    <div class="ep-card">
+      <span class="ep-method get">GET</span>
+      <div><div class="ep-path">/ready</div><div class="ep-desc">Returns 200 only after the 3D U-Net is loaded. Returns 503 if model files are missing. Use for K8s readiness probe.</div></div>
+    </div>
+    <div class="ep-card">
+      <span class="ep-method get">GET</span>
+      <div><div class="ep-path">/metrics</div><div class="ep-desc">Prometheus metrics endpoint — request counts, latency histograms. Scraped automatically by Prometheus.</div></div>
+    </div>
+    <div class="ep-card">
+      <span class="ep-method post">POST</span>
+      <div><div class="ep-path">/super-resolve</div><div class="ep-desc">Upload a .raw LR volume as a multipart file. Returns the super-resolved HR volume as raw bytes. <strong>Main endpoint.</strong></div></div>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:12px;">POST /super-resolve — parameters</h3>
+  <div class="tbl-wrap">
+    <table class="param-table">
+      <thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pn">file</span></td><td><span class="pt">upload</span></td><td><span class="pr req">required</span></td><td>The .raw binary file — packed voxels, no headers</td></tr>
+        <tr><td><span class="pn">x, y, z</span></td><td><span class="pt">int</span></td><td><span class="pr req">required</span></td><td>LR volume dimensions in voxels. Used to verify file size = x×y×z×sizeof(dtype)</td></tr>
+        <tr><td><span class="pn">lr_spacing</span></td><td><span class="pt">float</span></td><td><span class="pr req">required</span></td><td>LR voxel size in µm — e.g. <code>5.38</code>. Must be > hr_spacing</td></tr>
+        <tr><td><span class="pn">hr_spacing</span></td><td><span class="pt">float</span></td><td><span class="pr req">required</span></td><td>Target HR voxel size in µm — e.g. <code>0.65</code>. Scale = lr/hr ≈ 8.28×</td></tr>
+        <tr><td><span class="pn">dtype</span></td><td><span class="pt">str</span></td><td><span class="pr opt">float32</span></td><td>Input voxel type: <code>float32</code>, <code>uint16</code>, <code>int16</code>, <code>float64</code>, <code>uint8</code></td></tr>
+        <tr><td><span class="pn">lr_norm_lo / hi</span></td><td><span class="pt">float</span></td><td><span class="pr opt">auto</span></td><td>Normalisation bounds. If omitted, estimated from the scan's own 1st–99th percentile</td></tr>
+        <tr><td><span class="pn">out_dtype</span></td><td><span class="pt">str</span></td><td><span class="pr opt">float32</span></td><td>Output dtype: <code>float32</code> (0–1) or <code>uint16</code> (0–65535)</td></tr>
+        <tr><td><span class="pn">overlap</span></td><td><span class="pt">int</span></td><td><span class="pr opt">16</span></td><td>Tile overlap in HR voxels. Higher = smoother seams, slower</td></tr>
+        <tr><td><span class="pn">batch_size</span></td><td><span class="pt">int</span></td><td><span class="pr opt">4</span></td><td>Tiles per GPU batch. Reduce if OOM; increase if GPU has headroom</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin-top:24px;margin-bottom:12px;">Call the API — curl &amp; Python</h3>
+  <div class="two-col">
+    <div class="cmd-block">
+      <div class="cmd-header"><span>curl</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><code><span class="c-fn">curl</span> <span class="c-attr">-X POST</span> \
+  <span class="c-str">"http://localhost:8000/super-resolve?\
+x=200&y=200&z=100&\
+lr_spacing=5.38&hr_spacing=0.65"</span> \
+  <span class="c-attr">-F</span> <span class="c-str">"file=@scan_float32_200x200x100.raw"</span> \
+  <span class="c-attr">--output</span> scan_SR.raw
+
+<span class="c-cmt"># Output filename from Content-Disposition:</span>
+<span class="c-cmt"># scan_SR_float32_1656x1656x828.raw</span></code></pre>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span>Python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><code><span class="c-kw">import</span> httpx, numpy <span class="c-kw">as</span> np
+<span class="c-kw">from</span> pathlib <span class="c-kw">import</span> Path
+
+raw = Path(<span class="c-str">"scan.raw"</span>).<span class="c-fn">read_bytes</span>()
+resp = httpx.<span class="c-fn">post</span>(
+  <span class="c-str">"http://localhost:8000/super-resolve"</span>,
+  params={<span class="c-str">"x"</span>:<span class="c-num">200</span>,<span class="c-str">"y"</span>:<span class="c-num">200</span>,<span class="c-str">"z"</span>:<span class="c-num">100</span>,
+          <span class="c-str">"lr_spacing"</span>:<span class="c-num">5.38</span>,
+          <span class="c-str">"hr_spacing"</span>:<span class="c-num">0.65</span>},
+  files={<span class="c-str">"file"</span>:(<span class="c-str">"scan.raw"</span>,raw)},
+  timeout=<span class="c-num">600</span>,
+)
+resp.<span class="c-fn">raise_for_status</span>()
+Path(<span class="c-str">"scan_SR.raw"</span>).<span class="c-fn">write_bytes</span>(resp.content)</code></pre>
+    </div>
+  </div>
+  <div class="tip-box" style="margin-top:12px;">
+    <strong>💡 Swagger UI:</strong> Navigate to <code>http://localhost:8000/docs</code> for a fully interactive UI — upload your .raw file, fill in the form fields, and download the result directly in your browser.
+  </div>
+</section>
+
+<!-- MONITORING -->
+<section id="monitoring">
+  <div class="label">Observability</div>
+  <h2>Prometheus + Grafana monitoring</h2>
+  <p style="margin-bottom:20px">Every API request is automatically instrumented by <code>prometheus-fastapi-instrumentator</code>. Metrics are exposed at <code>/metrics</code> and scraped by Prometheus every 15 seconds.</p>
+
+  <div class="mon-grid">
+    <div class="mon-card">
+      <div class="mc-title">Request Rate</div>
+      <div class="mc-val" id="mc-rps">3.2 /s</div>
+      <div class="mc-sub">http_requests_total</div>
+      <div class="sparkline"><div class="spark-bar" id="spark1"></div></div>
+    </div>
+    <div class="mon-card">
+      <div class="mc-title">Median Latency</div>
+      <div class="mc-val">14.2s</div>
+      <div class="mc-sub">http_request_duration_seconds p50</div>
+      <div class="sparkline"><div class="spark-bar" id="spark2"></div></div>
+    </div>
+    <div class="mon-card">
+      <div class="mc-title">Error Rate</div>
+      <div class="mc-val" style="color:var(--ok)">0.0%</div>
+      <div class="mc-sub">4xx + 5xx responses</div>
+      <div class="sparkline"><div class="spark-bar" id="spark3"></div></div>
+    </div>
+    <div class="mon-card">
+      <div class="mc-title">Active Pods</div>
+      <div class="mc-val">2</div>
+      <div class="mc-sub">HPA min replicas</div>
+      <div class="sparkline"><div class="spark-bar" id="spark4"></div></div>
+    </div>
+  </div>
+
+  <div class="mon-urls">
+    <div class="mon-url"><span class="dot dot-g"></span><span style="font-size:.78rem;color:var(--fg3);min-width:90px;">API docs</span><a>http://localhost:8000/docs</a></div>
+    <div class="mon-url"><span class="dot dot-g"></span><span style="font-size:.78rem;color:var(--fg3);min-width:90px;">Raw metrics</span><a>http://localhost:8000/metrics</a></div>
+    <div class="mon-url"><span class="dot dot-g"></span><span style="font-size:.78rem;color:var(--fg3);min-width:90px;">Prometheus</span><a>http://localhost:9090</a></div>
+    <div class="mon-url"><span class="dot dot-g"></span><span style="font-size:.78rem;color:var(--fg3);min-width:90px;">Grafana</span><a>http://localhost:3000</a><span style="font-size:.72rem;color:var(--fg3);margin-left:6px;">admin/admin</span></div>
+  </div>
+
+  <div class="cmd-block" style="margin-top:16px;">
+    <div class="cmd-header"><span>Start monitoring stack</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre><code><span class="c-fn">cd</span> monitoring
+<span class="c-fn">docker compose up</span> <span class="c-attr">--build</span>   <span class="c-cmt"># API + Prometheus + Grafana</span>
+<span class="c-fn">docker compose down</span>         <span class="c-cmt"># tear down</span></code></pre>
+  </div>
+</section>
+
+<!-- KUBERNETES -->
+<section id="k8s">
+  <div class="label">Kubernetes deployment</div>
+  <h2>How the service runs on EKS</h2>
+  <p style="margin-bottom:20px">One YAML file defines three Kubernetes resources that work together to run the service reliably at scale.</p>
+  <div class="k8s-row">
+    <div class="k8s-box dep">
+      <span class="k8s-badge">Deployment</span>
+      <h3 style="margin-bottom:10px;">mri-seg</h3>
+      <div class="k8s-row-item"><span class="k8s-key">replicas</span><span class="k8s-val">2 (min)</span></div>
+      <div class="k8s-row-item"><span class="k8s-key">image</span><span class="k8s-val">ghcr.io/csarasaen/MRISegAPI</span></div>
+      <div class="k8s-row-item"><span class="k8s-key">CPU limit</span><span class="k8s-val">2 cores</span></div>
+      <div class="k8s-row-item"><span class="k8s-key">Memory limit</span><span class="k8s-val">2 Gi</span></div>
+      <div class="k8s-row-item"><span class="k8s-key">liveness</span><span class="k8s-val">GET /healthz</span></div>
+      <div class="k8s-row-item"><span class="k8s-key">readiness</span><span class="k8s-val">GET /ready</span></div>
+      <div class="k8s-row-item"><span class="k8s-key">user</span><span class="k8s-val">appuser (non-root)</span></div>
+    </div>
+    <div class="k8s-box svc">
+      <span class="k8s-badge">Service</span>
+      <h3 style="margin-bottom:10px;">mri-seg-svc</h3>
+      <div class="k8s-row-item"><span class="k8s-key">type</span><span class="k8s-val">LoadBalancer</span></div>
+      <div class="k8s-row-item"><span class="k8s-key">port</span><span class="k8s-val">80 → 8000</span></div>
+      <div class="k8s-row-item"><span class="k8s-key">selector</span><span class="k8s-val">app: mri-seg</span></div>
+      <p style="font-size:.78rem;margin-top:10px;color:var(--fg3);">AWS provisions an ELB automatically when type=LoadBalancer. Your API URL comes from the ELB's DNS name.</p>
+    </div>
+    <div class="k8s-box hpa">
+      <span class="k8s-badge">HorizontalPodAutoscaler</span>
+      <h3 style="margin-bottom:10px;">mri-seg-hpa</h3>
+      <div class="k8s-row-item"><span class="k8s-key">min pods</span><span class="k8s-val">2</span></div>
+      <div class="k8s-row-item"><span class="k8s-key">max pods</span><span class="k8s-val">20</span></div>
+      <div class="k8s-row-item"><span class="k8s-key">scale up when</span><span class="k8s-val">CPU &gt; 70%</span></div>
+      <div class="k8s-row-item"><span class="k8s-key">or when</span><span class="k8s-val">Memory &gt; 80%</span></div>
+      <p style="font-size:.78rem;margin-top:10px;color:var(--fg3);">Under a burst of scan jobs, K8s automatically launches new pods up to 20 replicas. When load drops, it scales back down to 2.</p>
+    </div>
+  </div>
+
+  <div class="cmd-block" style="margin-top:20px;">
+    <div class="cmd-header"><span>Deploy to EKS (after terraform apply)</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre><code><span class="c-cmt"># Apply the K8s manifests</span>
+<span class="c-fn">kubectl apply</span> <span class="c-attr">-f</span> kubernetes/manifests/deployment.yml
+
+<span class="c-cmt"># Watch pods come up</span>
+<span class="c-fn">kubectl get pods</span> <span class="c-attr">-w</span>
+
+<span class="c-cmt"># Get the public URL</span>
+<span class="c-fn">kubectl get svc</span> mri-seg-svc</code></pre>
+  </div>
+</section>
+
+<!-- CI/CD -->
+<section id="cicd">
+  <div class="label">Continuous Integration / Delivery</div>
+  <h2>What happens on every git push</h2>
+  <p style="margin-bottom:20px">GitHub Actions runs automatically on every push to <code>main</code> or any pull request. Three jobs run in sequence.</p>
+
+  <div class="pipeline" style="margin-bottom:16px;">
+    <div class="pipe-step">
+      <div class="ps-icon">📋</div>
+      <div class="ps-label">Lint</div>
+      <div class="ps-sub">ruff check app/</div>
+    </div>
+    <div class="pipe-arr">→</div>
+    <div class="pipe-step">
+      <div class="ps-icon">🧪</div>
+      <div class="ps-label">Test</div>
+      <div class="ps-sub">pytest app/tests/</div>
+    </div>
+    <div class="pipe-arr">→</div>
+    <div class="pipe-step">
+      <div class="ps-icon">🔧</div>
+      <div class="ps-label">Terraform fmt</div>
+      <div class="ps-sub">aws/ fmt -check</div>
+    </div>
+    <div class="pipe-arr">→</div>
+    <div class="pipe-step hi">
+      <div class="ps-icon">🐳</div>
+      <div class="ps-label">Build &amp; Push</div>
+      <div class="ps-sub">ghcr.io image</div>
+    </div>
+    <div class="pipe-arr">→</div>
+    <div class="pipe-step">
+      <div class="ps-icon">☸️</div>
+      <div class="ps-label">Deploy EKS <span class="continue-badge">optional</span></div>
+      <div class="ps-sub">main branch only</div>
+    </div>
+  </div>
+  <p class="pipe-note">Steps 1–3 run in one job (<em>Lint &amp; Test</em>). Build &amp; Push only runs after that job passes. Deploy has <code>continue-on-error: true</code> — CI stays green even without a real cluster.</p>
+  <p class="pipe-note" style="margin-top:6px;">The <strong>Azure DevOps mirror</strong> in <code>azure-pipelines/azure-pipelines.yml</code> runs the same stages in Azure Pipelines syntax — useful if your team is on AzDO.</p>
+</section>
+
+<!-- CONCEPTS -->
+<section>
+  <div class="label">Key decisions explained</div>
+  <h2>Why was it built this way?</h2>
+  <p style="margin-bottom:20px">Click any question to see the reasoning.</p>
+  <div class="concept-list">
+    <div class="concept-item">
+      <div class="concept-header" onclick="toggleConcept(this)">
+        <div class="concept-title"><span>🔒</span> Why are model weights NOT in the Docker image?</div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="concept-body"><p>Baking multi-GB weight files into the image creates massive images that are slow to pull and push. It also ties a specific model version to the image tag, making weight updates require a full rebuild and redeploy. Mounting via a Kubernetes volume (or <code>-v</code> locally) means you can swap weights without touching the image at all — and avoids accidentally leaking proprietary model data in a registry.</p></div>
+    </div>
+    <div class="concept-item">
+      <div class="concept-header" onclick="toggleConcept(this)">
+        <div class="concept-title"><span>⚡</span> Why is TensorFlow loaded lazily?</div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="concept-body"><p>Importing TensorFlow at module level would make every test import fail unless TF is installed — adding ~2 GB to the CI environment. By importing inside <code>_configure_tf()</code> and <code>get_model()</code>, the tests run with only the lightweight deps (<code>fastapi</code>, <code>numpy</code>, etc.). The model is also cached globally after first load so subsequent requests pay no reload cost.</p></div>
+    </div>
+    <div class="concept-item">
+      <div class="concept-header" onclick="toggleConcept(this)">
+        <div class="concept-title"><span>💰</span> Why Spot instances for GPU nodes?</div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="concept-body"><p>GPU instances (g4dn.xlarge) are expensive — ~$0.53/hr on-demand. Spot instances offer the same hardware at ~70% discount. Super-resolution jobs are retry-able (stateless REST calls), so an occasional Spot interruption just triggers a client retry. The HPA keeps 2 pods running; Spot suits the inference worker pool, not the always-on baseline.</p></div>
+    </div>
+    <div class="concept-item">
+      <div class="concept-header" onclick="toggleConcept(this)">
+        <div class="concept-title"><span>👤</span> Why run as a non-root user in Docker?</div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="concept-body"><p>Medical data workloads are typically subject to compliance requirements (HIPAA, GDPR). Running as <code>appuser</code> (non-root) is a security baseline — if the container is compromised, the attacker has limited filesystem write access. Most production Kubernetes security policies (PSP / OPA) also block root containers by default.</p></div>
+    </div>
+    <div class="concept-item">
+      <div class="concept-header" onclick="toggleConcept(this)">
+        <div class="concept-title"><span>📐</span> Why does the API validate file byte size?</div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="concept-body"><p>A .raw file has no header — the API can't detect corruption by inspecting it. Checking that <code>len(bytes) == x × y × z × sizeof(dtype)</code> catches the most common user errors: wrong dimensions, wrong dtype, truncated upload, or a non-.raw file submitted by mistake. This fails fast with a 400 before any expensive model inference runs.</p></div>
+    </div>
+    <div class="concept-item">
+      <div class="concept-header" onclick="toggleConcept(this)">
+        <div class="concept-title"><span>🔄</span> What does the HPA actually do?</div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="concept-body"><p>The HorizontalPodAutoscaler watches CPU and memory usage across all running pods. When average CPU exceeds 70% or memory 80%, it launches new pods — up to 20. Each pod handles one super-resolution job (inference is single-threaded per pod). When load drops, it terminates extra pods back to the minimum of 2. This means the service automatically scales for burst scan batches without manual intervention.</p></div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <div class="page">
+    <p>MRISegAPI · FastAPI + TensorFlow 2.16 · AWS EKS · Kubernetes · Prometheus + Grafana</p>
+    <p style="margin-top:6px;">Repo: <a href="https://github.com/csarasaen/MRISegAPI" target="_blank">github.com/csarasaen/MRISegAPI</a> · Docs: <a>localhost:8000/docs</a></p>
+  </div>
+</footer>
+
+<script>
+function toggleTheme(){
+  const r=document.documentElement,c=r.getAttribute('data-theme');
+  if(c==='dark')r.removeAttribute('data-theme');
+  else if(c==='light')r.setAttribute('data-theme','dark');
+  else r.setAttribute('data-theme',window.matchMedia('(prefers-color-scheme:dark)').matches?'light':'dark');
+}
+function switchQS(id,btn){
+  document.querySelectorAll('.qs-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.qs-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('qs-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+function toggleTree(item){
+  const next=item.nextElementSibling;
+  if(next&&next.classList.contains('tree-children')){
+    next.classList.toggle('open');
+    item.querySelector('.ti-icon').textContent=next.classList.contains('open')?'📂':'📁';
+  }
+}
+function toggleConcept(hdr){hdr.parentElement.classList.toggle('open');}
+function copyCode(btn){
+  const code=btn.closest('.cmd-block').querySelector('code');
+  const text=code.innerText||code.textContent;
+  try{
+    navigator.clipboard.writeText(text).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='copy',1500);});
+  }catch(e){btn.textContent='✗';}
+}
+
+// Sparklines
+function buildSpark(id,data,color){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const max=Math.max(...data);
+  data.forEach(v=>{
+    const s=document.createElement('span');
+    s.style.height=(v/max*100)+'%';
+    s.style.background=color||'var(--acc)';
+    el.appendChild(s);
+  });
+}
+buildSpark('spark1',[1.2,1.8,2.1,3.4,2.9,3.2,3.1,2.8,3.5,3.2,3.0,3.2],'var(--acc)');
+buildSpark('spark2',[18,15,14,16,14,13,15,14,14,15,13,14],'var(--acc2)');
+buildSpark('spark3',[0,0,0,0,0,0,0,0,0,0,0,0],'var(--ok)');
+buildSpark('spark4',[2,2,2,3,4,3,2,2,3,2,2,2],'var(--warn)');
+</script>
+
+</body></html>
