@@ -11,6 +11,7 @@ from tensorflow import keras
 
 from app.srtools import srData
 
+
 def saveModel(model, saveName):
     """saveName: '.keras' file, or (json_path, weights_path) tuple."""
     if isinstance(saveName, tuple):
